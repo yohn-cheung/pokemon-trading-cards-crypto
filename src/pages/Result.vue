@@ -132,19 +132,19 @@
 
         <q-card-section class="q-gutter-md">
           <q-input
-            v-model="payment.price"
+            v-model="payment.formattedPrice"
             disable
             dense
             filled
             label="current price in US dollar"
           />
-          <q-input
+          <!-- <q-input
             v-model="payment.rateinUSD"
             disable
             dense
             filled
             label="current rate in US dollar"
-          />
+          /> -->
 
           <q-select
             filled
@@ -155,11 +155,15 @@
           />
           <q-input
             v-if="payment.selectedOption === 'Card market'"
-            v-model="payment.total"
+            v-model="payment.totalInCrypto"
             disable
             dense
             filled
+            label="Amount of coins to pay"
           />
+          <div class="text-caption">
+            {{ payment.summary }}
+          </div>
         </q-card-section>
 
         <q-card-actions align="right">
@@ -197,11 +201,11 @@ export default defineComponent({
         field: "name",
       },
       {
-        name: "price",
+        name: "formattedPrice",
         required: true,
         align: "left",
         label: "Price",
-        field: "price",
+        field: "formattedPrice",
       },
     ]);
     const rows = reactive([]);
@@ -217,12 +221,13 @@ export default defineComponent({
 
     let payment = reactive({
       title: "",
-      price: "",
-      selectedOption: null,
-      options: ["Card market"],
+      formattedPrice: "",
+      selectedOption: "Card market",
+      options: ["Card market", " TCG Player"],
       amount: 1,
-      rateinUSD: "",
-      total: "",
+      // rateinUSD: "",
+      totalInCrypto: "",
+      summary: "",
     });
 
     function getPokemonData() {
@@ -257,6 +262,7 @@ export default defineComponent({
           const currencies = result.data.data;
 
           currencies.forEach((currency) => {
+            console.log("currency: ", currency);
             const formatter = new Intl.NumberFormat("en-US", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
@@ -265,8 +271,9 @@ export default defineComponent({
             const object = {
               index: currency.rank,
               name: currency.name,
-              price: `$${formatter.format(currency.priceUsd)}`,
+              formattedPrice: `$${formatter.format(currency.priceUsd)}`,
               id: currency.id,
+              price: currency.priceUsd,
             };
             rows.push(object);
           });
@@ -275,19 +282,23 @@ export default defineComponent({
     }
 
     function openDialog(evt, row, index) {
-      const formatter = new Intl.NumberFormat("de-DE", {
-        style: "currency",
-        currency: "EUR",
-      });
-
       dialog.value = true;
       payment.title = row.name;
-      payment.price = row.price;
-      payment.rateinUSD = `$${rateUsd.value}`;
-      const totalPrice =
+      payment.formattedPrice = row.formattedPrice;
+
+      const formatter = new Intl.NumberFormat("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
+      let priceCardMarketInUSD =
         pokemonData.value.cardmarket.prices.trendPrice * rateUsd.value;
-      // payment.total = `€${totalPrice}`;
-      payment.total = formatter.format(totalPrice);
+
+      console.log("priceCardMarketInUSD: ", priceCardMarketInUSD);
+      console.log("row.price: ", row.price);
+
+      payment.totalInCrypto = priceCardMarketInUSD /= row.price;
+      payment.summary = `(Trend price * rate in USD) divided by price of crypto currency ((€${pokemonData.value.cardmarket.prices.trendPrice} * ${rateUsd.value}) / ${row.formattedPrice})`;
     }
 
     function startPayment() {
