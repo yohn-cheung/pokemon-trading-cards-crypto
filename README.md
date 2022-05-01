@@ -1,59 +1,35 @@
-# Pokemon Trading Cards Crypto (pokemon-trading-cards-crypto)
+# Pokemon Trading Cards Crypto
 
-A Quasar Project
+A concept project to buy pokemon cards with cryptocurrency. The user can search for a pokemon card and buy it for the current market price with cryptocurrency. In this project contains two REST api, pokemon card api and coincap api.
+
+For the smart contract developement, I use Hardhat. With hardhat I was able to write a contract and deploy.
+
+This project is build:
+
+| Resource          | Link                                        |
+| ----------------- | ------------------------------------------- |
+| Quasar            | https://quasar.dev/                         |
+| Hardhat           | https://hardhat.org/tutorial/               |
+| Program with Erik | https://www.youtube.com/watch?v=FBUMbdiI6Ug |
+| Coincap io        | https://coincap.io/                         |
+| Pokemon Card Api  | https://pokemontcg.io/                      |
 
 ## Install the dependencies
 
 ```bash
-yarn
-# or
 npm install
+npm run dev
 ```
 
-### Start the app in development mode (hot-code reloading, error reporting, etc.)
+## Usage
 
-```bash
-quasar dev
-```
+You wil need the following:
 
-### Lint the files
+- Metamask account
+- Alchamy account
 
-```bash
-yarn lint
-# or
-npm run lint
-```
+Follow the online tutorial of Program with Erik. The settings is moslty based on his tutorial.
 
-### Format the files
+## License
 
-```bash
-yarn format
-# or
-npm run format
-```
-
-### Build the app for production
-
-```bash
-quasar build
-```
-
-### Customize the configuration
-
-See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
-
-# Basic Sample Hardhat Project
-
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
-
-Try running some of the following tasks:
-
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-node scripts/sample-script.js
-npx hardhat help
-```
+MIT
