@@ -18,83 +18,99 @@
     <div class="q-pa-md row items-start q-gutter-md" v-if="results.length > 0">
       <q-card
         class="my-card"
+        flat
+        bordered
         v-for="(item, index) in results"
         :key="index"
         @click="openPage(item.id)"
       >
-        <q-img :src="item.images.small">
-          <div class="absolute-bottom text-h6">{{ item.name }}</div>
-        </q-img>
+        <q-card-section horizontal>
+          <q-img
+            class="col-5"
+            :src="item.images.small"
+            :ratio="4 / 3"
+            :alt="item.name"
+            position="0 0"
+          />
+          <q-list dense>
+            <q-item>
+              <q-item-section>
+                <q-item-label class="text-subtitle1 text-weight-bold">
+                  {{ item.name }}
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section caption>
+                <q-item-label>
+                  Release date: {{ item.set.releaseDate }}
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section caption>
+                <q-item-label> Series: {{ item.set.series }} </q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-card-section>
       </q-card>
     </div>
   </q-page>
 </template>
 
 <script>
-import { defineComponent, ref, reactive } from "vue";
-import { useRouter, useRoute } from "vue-router";
-import { useQuasar } from "quasar";
-
 import pokemon from "pokemontcgsdk";
 
-export default defineComponent({
+export default {
   name: "IndexPage",
-  setup() {
+  data() {
+    return {
+      search: "",
+      results: [],
+    };
+  },
+  created() {
     pokemon.configure({ apiKey: process.env.POKEMON_API });
-    let search = ref("");
-    let results = ref([]);
+  },
+  methods: {
+    openPage(id) {
+      this.$router.push(`/result/${id}`);
+    },
+    getResults() {
+      if (this.search === "") return;
 
-    const router = useRouter();
-    const route = useRoute();
-
-    const $q = useQuasar();
-
-    function openPage(id) {
-      router.push(`/result/${id}`);
-    }
-
-    function getResults() {
-      if (search.value === "") return;
-
-      $q.loading.show();
+      this.$q.loading.show();
 
       pokemon.card
-        .where({ q: `name:${search.value}*` })
+        .where({ q: `name:${this.search}*` })
         .then((result) => {
           if (result.data.length === 0) {
             showNotification();
           } else {
-            results.value = result.data;
+            this.results = result.data;
           }
 
-          $q.loading.hide();
+          this.$q.loading.hide();
         })
-        .catch((error) => {
-          $q.loading.hide();
+        .catch(() => {
+          this.$q.loading.hide();
           showNotification();
         });
-    }
-
-    function showNotification() {
-      $q.notify({
+    },
+    showNotification() {
+      this.$q.notify({
         progress: true,
         position: "top",
+        type: "negative",
         message: "No result, try again",
       });
-    }
-
-    return {
-      search,
-      results,
-      getResults,
-      openPage,
-    };
+    },
   },
-});
+};
 </script>
 
 <style lang="sass" scoped>
 .my-card
   width: 100%
-  max-width: 30%
 </style>
