@@ -86,7 +86,7 @@ export default {
         .where({ q: `name:${this.search}*` })
         .then((result) => {
           if (result.data.length === 0) {
-            showNotification();
+            this.showNotification();
           } else {
             this.results = result.data;
           }
@@ -95,7 +95,7 @@ export default {
         })
         .catch(() => {
           this.$q.loading.hide();
-          showNotification();
+          this.showNotification();
         });
     },
     showNotification() {
