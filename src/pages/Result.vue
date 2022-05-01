@@ -1,174 +1,127 @@
 <template>
   <q-page class="q-pa-md row items-start">
-    <q-card class="full-width" flat>
-      <q-card-section horizontal v-if="pokemonData">
-        <q-img class="col-4" :src="pokemonData.images.small" />
-        <q-card-section class="col-8">
-          <div class="text-h5 q-mt-sm q-mb-xs">{{ pokemonData.name }}</div>
-          <div class="text-caption">
-            <div class="row">
-              <div class="col-6">
-                Release date: {{ pokemonData.set.releaseDate }}
-              </div>
-              <div class="col-6">Series: {{ pokemonData.set.series }}</div>
-              <div class="col-12">
-                Latest update: {{ pokemonData.tcgplayer.updatedAt }}
-              </div>
-            </div>
-          </div>
-          <q-separator class="q-my-md" />
-          <div
-            class="text-caption"
-            v-if="pokemonData.tcgplayer.prices.holofoil"
-          >
-            <div class="text-h6 q-mt-sm q-mb-xs">
-              <a
-                :href="pokemonData.tcgplayer.url"
-                target="_blank"
-                rel="noopener noreferrer"
-                >Prices from TCG Player</a
-              >
-            </div>
-            <q-chip icon="event" square class="q-my-sm q-mx-none" size="sm"
-              >Updated at {{ pokemonData.tcgplayer.updatedAt }}</q-chip
-            >
-
-            <div class="row">
-              <div class="col-3">
-                HOLOFOIL Market <br />${{
-                  pokemonData.tcgplayer.prices.holofoil.market
-                }}
-              </div>
-              <div class="col-3">
-                HOLOFOIL Low <br />${{
-                  pokemonData.tcgplayer.prices.holofoil.low
-                }}
-              </div>
-              <div class="col-3">
-                HOLOFOIL Mid <br />${{
-                  pokemonData.tcgplayer.prices.holofoil.mid
-                }}
-              </div>
-              <div class="col-3">
-                HOLOFOIL High <br />${{
-                  pokemonData.tcgplayer.prices.holofoil.high
-                }}
-              </div>
-            </div>
-          </div>
-          <div class="text-caption" v-if="pokemonData.cardmarket.prices">
-            <div class="text-h6 q-mt-sm q-mb-xs">
-              <a
-                :href="pokemonData.cardmarket.url"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Prices from card market
-              </a>
-            </div>
-            <q-chip icon="event" square class="q-my-sm q-mx-none" size="sm"
-              >Updated at {{ pokemonData.cardmarket.updatedAt }}</q-chip
-            >
-
-            <div class="row">
-              <div class="col-3">
-                Price trend<br />€{{ pokemonData.cardmarket.prices.trendPrice }}
-              </div>
-              <div class="col-3">
-                1 DAY AVERAGE <br />€{{ pokemonData.cardmarket.prices.avg1 }}
-              </div>
-              <div class="col-3">
-                7 DAY AVERAGE <br />€{{ pokemonData.cardmarket.prices.avg7 }}
-              </div>
-              <div class="col-3">
-                30 DAY AVERAGE <br />€{{ pokemonData.cardmarket.prices.avg30 }}
-              </div>
-            </div>
-          </div>
-          <q-separator class="q-my-md" />
-          <div class="text-caption">
-            <q-table
-              class="table"
-              style="height: 250px; max-height: 300px"
-              title="Latest cryptocurrency"
-              :rows="rows"
-              :columns="columns"
-              row-key="index"
-              :hide-pagination="true"
-              :flat="true"
-              dense
-              :filter="filter"
-              virtual-scroll
-              v-model:pagination="pagination"
-              :rows-per-page-options="[0]"
-              @row-click="openDialog"
-            >
-              <template v-slot:top-right>
-                <q-input
-                  borderless
-                  dense
-                  debounce="300"
-                  v-model="filter"
-                  placeholder="Search"
-                >
-                  <template v-slot:append>
-                    <q-icon name="search" />
-                  </template>
-                </q-input>
-              </template>
-            </q-table>
-          </div>
-        </q-card-section>
+    <q-card class="full-width" flat v-if="pokemonData">
+      <q-card-section horizontal>
+        <q-img
+          class="col-4"
+          :src="pokemonData.images.small"
+          :ratio="4 / 3"
+          :alt="pokemonData.name"
+          position="0 0"
+        />
+        <q-list dense class="full-width">
+          <q-item>
+            <q-item-section>
+              <q-item-label class="text-subtitle1 text-weight-bold">
+                {{ pokemonData.name }}
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item>
+            <q-item-section>
+              <q-item-label>
+                Release date:
+                {{ pokemonData.set.releaseDate }}
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item>
+            <q-item-section>
+              <q-item-label> Name: {{ pokemonData.set.name }} </q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item>
+            <q-item-section>
+              <q-item-label>
+                Series: {{ pokemonData.set.series }}
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item>
+            <q-item-section>
+              <q-item-label>
+                {{ pokemonData.flavorText }}
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
       </q-card-section>
+
+      <q-list
+        dense
+        class="full-width q-py-md"
+        v-if="pokemonData.tcgplayer.prices"
+      >
+        <q-item-label header
+          ><a
+            :href="pokemonData.tcgplayer.url"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Prices from TCG Player</a
+          ></q-item-label
+        >
+
+        <Item
+          :tcgplayer="pokemonData.tcgplayer.prices"
+          @selected-price="openDialog"
+        />
+      </q-list>
     </q-card>
 
-    <q-dialog v-model="dialog" persistent>
+    <q-dialog v-model="stateDialog" persistent>
       <q-card style="width: 700px; max-width: 80vw">
         <q-card-section class="row items-center q-pb-none">
-          <div class="text-h6">{{ payment.title }}</div>
+          <div class="text-h6">
+            Confirmation payment - {{ selectedPrice.type }} -
+            {{ selectedPrice.key }}
+          </div>
           <q-space />
-          <q-btn icon="close" flat round dense v-close-popup />
+          <q-btn icon="close" flat round dense @click="closeDialog" />
         </q-card-section>
 
         <q-card-section class="q-gutter-md">
           <q-input
-            v-model="payment.formattedPrice"
+            v-model="selectedPrice.cardPrice"
+            disable
+            dense
+            filled
+            label="Price of card in dollar"
+          />
+          <q-select
+            filled
+            v-model="payment.selectedCurrency"
+            :options="payment.options"
+            label="Choose a cryptocurrency"
+            dense
+          />
+
+          <q-input
+            v-if="payment.selectedCurrency !== ''"
+            v-model="payment.selectedCurrency.price"
             disable
             dense
             filled
             label="current price in US dollar"
           />
-          <!-- <q-input
-            v-model="payment.rateinUSD"
-            disable
-            dense
-            filled
-            label="current rate in US dollar"
-          /> -->
-
-          <q-select
-            filled
-            v-model="payment.selectedOption"
-            :options="payment.options"
-            label="Choose a market"
-            dense
-          />
           <q-input
-            v-if="payment.selectedOption === 'Card market'"
-            v-model="payment.totalInCrypto"
+            v-if="payment.selectedCurrency !== ''"
+            v-model="payment.totalAmount"
             disable
             dense
             filled
             label="Amount of coins to pay"
           />
-          <div class="text-caption">
-            {{ payment.summary }}
-          </div>
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn flat label="Cancel" color="primary" v-close-popup />
-          <q-btn flat label="Pay" color="primary" @click="startPayment" />
+          <q-btn flat label="Cancel" color="primary" @click="closeDialog" />
+          <q-btn
+            flat
+            :disabled="payment.selectedCurrency === ''"
+            label="Pay"
+            color="primary"
+            @click="startPayment"
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -176,161 +129,152 @@
 </template>
 
 <script>
-import { defineComponent, reactive, ref } from "vue";
-import axios from "axios";
-
 import pokemon from "pokemontcgsdk";
+import { ethers } from "ethers";
+import { contractABI, contractAddress } from "../utils/constants";
+import Item from "../components/Item.vue";
 
-export default defineComponent({
+export default {
   name: "ResultPage",
   props: ["id"],
-  setup(props) {
+  components: {
+    Item,
+  },
+  data() {
+    return {
+      pokemonData: null,
+      selectedPrice: null,
+      stateDialog: false,
+      payment: {
+        selectedCurrency: "",
+        options: [],
+        totalAmount: "",
+      },
+    };
+  },
+  created() {
     pokemon.configure({ apiKey: process.env.POKEMON_API });
-    const columns = reactive([
-      {
-        name: "index",
-        label: "#",
-        field: "index",
-        align: "left",
-      },
-      {
-        name: "name",
-        required: true,
-        align: "left",
-        label: "Name",
-        field: "name",
-      },
-      {
-        name: "formattedPrice",
-        required: true,
-        align: "left",
-        label: "Price",
-        field: "formattedPrice",
-      },
-    ]);
-    const rows = reactive([]);
-    const pagination = ref({
-      rowsPerPage: 0,
-    });
-
-    let pokemonData = ref(null);
-
-    const filter = ref("");
-    let dialog = ref(false);
-    let rateUsd = ref("");
-
-    let payment = reactive({
-      title: "",
-      formattedPrice: "",
-      selectedOption: "Card market",
-      options: ["Card market", " TCG Player"],
-      amount: 1,
-      // rateinUSD: "",
-      totalInCrypto: "",
-      summary: "",
-    });
-
-    function getPokemonData() {
+    this.getPokemonData();
+    this.getCurrencies();
+  },
+  methods: {
+    getPokemonData() {
       pokemon.card
-        .find(`${props.id}`)
+        .find(`${this.id}`)
         .then((card) => {
-          pokemonData.value = card;
+          this.pokemonData = card;
         })
         .catch((error) => {
           console.log("error: ", error);
-        });
-    }
-
-    function getEuroRate() {
-      axios
-        .get("https://api.coincap.io/v2/rates/euro")
-        .then((result) => {
-          const formatter = new Intl.NumberFormat("en-US", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
+          this.$q.notify({
+            progress: true,
+            position: "top",
+            type: "negative",
+            message: "Something went wrong, refresh the page again",
           });
-
-          rateUsd.value = formatter.format(result.data.data.rateUsd);
-        })
-        .catch((error) => console.log("error: ", error));
-    }
-
-    function getCurrencies() {
-      axios
+        });
+    },
+    openDialog(object) {
+      this.selectedPrice = object;
+      this.stateDialog = true;
+    },
+    closeDialog() {
+      this.payment.selectedCurrency = "";
+      this.stateDialog = false;
+    },
+    getCurrencies(data) {
+      this.$axios
         .get("https://api.coincap.io/v2/assets") // ids bitcoin/ethereum/polygon/solana/cardano // .get("https://api.coincap.io/v2/assets?limit=10")
         .then((result) => {
           const currencies = result.data.data;
 
           currencies.forEach((currency) => {
-            console.log("currency: ", currency);
             const formatter = new Intl.NumberFormat("en-US", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             });
 
+            const formattedPrice = formatter.format(currency.priceUsd);
+            let coins = data ? (data.price /= currency.priceUsd) : false;
+
             const object = {
-              index: currency.rank,
-              name: currency.name,
-              formattedPrice: `$${formatter.format(currency.priceUsd)}`,
-              id: currency.id,
+              label: currency.name,
+              value: formattedPrice,
               price: currency.priceUsd,
             };
-            rows.push(object);
+            this.payment.options.push(object);
           });
         })
         .catch((error) => console.log("error: ", error));
-    }
-
-    function openDialog(evt, row, index) {
-      dialog.value = true;
-      payment.title = row.name;
-      payment.formattedPrice = row.formattedPrice;
-
-      const formatter = new Intl.NumberFormat("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      });
-
-      let priceCardMarketInUSD =
-        pokemonData.value.cardmarket.prices.trendPrice * rateUsd.value;
-
-      console.log("priceCardMarketInUSD: ", priceCardMarketInUSD);
-      console.log("row.price: ", row.price);
-
-      payment.totalInCrypto = priceCardMarketInUSD /= row.price;
-      payment.summary = `(Trend price * rate in USD) divided by price of crypto currency ((€${pokemonData.value.cardmarket.prices.trendPrice} * ${rateUsd.value}) / ${row.formattedPrice})`;
-    }
-
-    function startPayment() {
+    },
+    async startPayment(row) {
       // start meta mask and do the payment
-      dialog.value = false;
-    }
+      this.$q.loading.show();
+      try {
+        const { ethereum } = window;
+        if (ethereum) {
+          // create provider object from ethers library, using ethereum object injected by metamask
 
-    return {
-      pokemonData,
-      columns,
-      rows,
-      pagination,
-      filter,
-      getPokemonData,
-      getCurrencies,
-      getEuroRate,
-      openDialog,
-      dialog,
-      payment,
-      rateUsd,
-      startPayment,
-    };
+          const provider = new ethers.providers.Web3Provider(ethereum);
+          const signer = provider.getSigner();
+          const PokemonCardContract = new ethers.Contract(
+            contractAddress,
+            contractABI.abi,
+            signer
+          );
+
+          const parsedAmount = ethers.utils.parseEther(
+            this.payment.totalAmount.toString()
+          );
+
+          const overrides = {
+            value: parsedAmount, // sending one ether
+          };
+
+          const cardTxn = await PokemonCardContract.buyCard(
+            this.pokemonData.id,
+            this.pokemonData.name,
+            this.pokemonData.set.series,
+            this.pokemonData.images.small,
+            parsedAmount._hex,
+            overrides
+          );
+          console.log("Mining...", cardTxn.hash);
+          await cardTxn.wait();
+          console.log("Mined -- ", cardTxn.hash);
+          this.$q.loading.hide();
+          this.$q.notify({
+            progress: true,
+            position: "top",
+            type: "positive",
+            message: "Payment succesfull, enjoy your Pokemon card",
+          });
+          this.payment.selectedCurrency = "";
+          this.stateDialog = false;
+        }
+      } catch (error) {
+        this.$q.loading.hide();
+        this.payment.selectedCurrency = "";
+        this.stateDialog = false;
+        this.$q.notify({
+          progress: true,
+          position: "top",
+          type: "negative",
+          message: "Payment failed, try again",
+        });
+      }
+    },
   },
-  created() {
-    this.getPokemonData();
-    this.getCurrencies();
-    this.getEuroRate();
+  watch: {
+    "payment.selectedCurrency": function (val) {
+      this.payment.totalAmount =
+        this.selectedPrice.cardPrice / this.payment.selectedCurrency.price;
+    },
   },
-});
+};
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
 .table
   /* height or max-height is important */
   height: 410px
